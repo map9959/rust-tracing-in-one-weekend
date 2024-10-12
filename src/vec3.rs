@@ -1,9 +1,10 @@
 use std::{ops, fmt::Display};
 
+#[derive(Copy, Clone)]
 pub struct Vec3{
-    x: f64,
-    y: f64,
-    z: f64
+    pub x: f64,
+    pub y: f64,
+    pub z: f64
 }
 impl Vec3{
     pub fn new(x: f64, y: f64, z: f64) -> Vec3{
@@ -53,6 +54,10 @@ impl Display for Vec3{
     }
 }
 
+pub fn write_color(v: Vec3){
+    println!("{} {} {}", (v.x * 255.999) as i32, (v.y * 255.999) as i32, (v.z * 255.999) as i32)
+}
+
 pub fn dot(lhs: Vec3, rhs: Vec3) -> f64{
     lhs.x*rhs.x + lhs.y*rhs.y + lhs.z*rhs.z
 }
@@ -63,5 +68,5 @@ pub fn cross(lhs: Vec3, rhs: Vec3) -> Vec3{
         lhs.x*rhs.y-lhs.y*rhs.x)
 }
 pub fn unit_vector(vec: &Vec3) -> Vec3{
-    return Vec3::new(vec.x, vec.y, vec.z)/(vec.length())
+    Vec3::new(vec.x, vec.y, vec.z)/(vec.length())
 }
