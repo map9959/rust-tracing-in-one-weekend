@@ -2,8 +2,11 @@ use indicatif::ProgressBar;
 use vec3::unit_vector;
 use crate::vec3::{Vec3, write_color};
 use crate::ray::Ray;
+use crate::hittable::Sphere;
+use crate::hittable::Hittable;
 mod vec3;
 mod ray;
+mod hittable;
 
 fn test_gradient(i: i32, j: i32, image_width: i32, image_height: i32) -> Vec3{
     Vec3::new(
@@ -14,6 +17,17 @@ fn test_gradient(i: i32, j: i32, image_width: i32, image_height: i32) -> Vec3{
 }
 
 fn ray_color(r: Ray) -> Vec3{
+    let sphere: Sphere = Sphere::new(
+        Vec3::new(0.0, 0.0, -1.0),
+        0.5
+    );
+    let hit = sphere.intersect(&r);
+    if hit > 0.0{
+        let intersect_point = r.at(hit);
+        let normal = unit_vector(&(intersect_point-Vec3::new(0.0,0.0,-1.0)));
+        return Vec3::new(normal.x+1.0, normal.y+1.0, normal.z+1.0)*0.5;
+    }
+
     let unit_direction = unit_vector(&r.direction);
     let a = unit_direction.y/2.0+0.5;
     Vec3::new(1.0, 1.0, 1.0)*(1.0-a)+Vec3::new(0.5, 0.7, 1.0)*a
@@ -47,8 +61,8 @@ fn main() {
             let pixel_loc = pixel00_loc + (pixel_delta_u*i as f64 + pixel_delta_v*j as f64);
             let pixel_direction = pixel_loc - camera_center;
             
-            let pixel_ray = Ray::new(pixel_loc, pixel_direction);
-            let color = ray_color(pixel_ray);
+            let camera_ray = Ray::new(camera_center, pixel_direction);
+            let color = ray_color(camera_ray);
             write_color(color);
         }
         progress_bar.inc(1);
