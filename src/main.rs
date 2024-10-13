@@ -22,7 +22,8 @@ fn main() {
     let viewport_height = 2.0;
     let camera_center = Vec3::new(0.0, 0.0, 0.0);
 
-    let samples_per_pixel = 10;
+    let samples_per_pixel = 20;
+    let max_depth = 10;
 
     let mut scene = Scene::new();
     let sphere1: Sphere = Sphere::new(
@@ -42,6 +43,7 @@ fn main() {
         focal_length, 
         viewport_height, 
         camera_center, 
-        samples_per_pixel);
+        samples_per_pixel,
+        max_depth);
     camera.render(&scene);
 }

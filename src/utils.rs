@@ -29,3 +29,4 @@ impl Interval{
 pub const EMPTY: Interval = Interval{min: f64::MAX, max: f64::MIN};
 pub const UNIVERSE: Interval = Interval{min: f64::MIN, max: f64::MAX};
 pub const NON_NEG: Interval = Interval{min: 0.0, max: f64::MAX};
+pub const NEAR_NON_NEG: Interval = Interval{min: 0.001, max: f64::MAX};

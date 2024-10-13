@@ -1,5 +1,6 @@
 use crate::vec3::Vec3;
-use crate::vec3::write_color;
+use crate::vec3::random_on_hemisphere;
+use crate::vec3::random_unit_vector;
 use crate::Ray;
 use crate::Scene;
 use crate::Hittable;
@@ -15,7 +16,8 @@ pub struct Camera{
     pixel_delta_u: Vec3,
     pixel_delta_v: Vec3,
     pixel00_loc: Vec3,
-    samples_per_pixel: i32
+    samples_per_pixel: i32,
+    max_depth: i32
 }
 impl Camera{
     pub fn new(
@@ -24,7 +26,8 @@ impl Camera{
         focal_length: f64, 
         viewport_height: f64, 
         camera_center: Vec3,
-        samples_per_pixel: i32
+        samples_per_pixel: i32,
+        max_depth: i32
     ) -> Camera{
         let image_height = (image_width as f64/aspect_ratio) as i32;
 
@@ -39,7 +42,7 @@ impl Camera{
         let viewport_upper_left = camera_center - Vec3::new(0.0, 0.0, focal_length) - viewport_u/2.0 - viewport_v/2.0;
         let pixel00_loc = viewport_upper_left + (pixel_delta_u+pixel_delta_v) * 0.5;
 
-        Camera{image_width, image_height, camera_center, pixel_delta_u, pixel_delta_v, pixel00_loc, samples_per_pixel}
+        Camera{image_width, image_height, camera_center, pixel_delta_u, pixel_delta_v, pixel00_loc, samples_per_pixel, max_depth}
     }
 
     pub fn render(&self, scene: &Scene){
@@ -52,10 +55,10 @@ impl Camera{
 
                 for _ in 0..self.samples_per_pixel{
                     let camera_ray = self.get_ray(i, j);
-                    color = color + Camera::ray_color(&camera_ray, scene);
+                    color = color + Camera::ray_color(&camera_ray, scene, self.max_depth);
                 }
 
-                write_color(color/self.samples_per_pixel as f64);
+                Camera::write_color(color/self.samples_per_pixel as f64);
             }
             progress_bar.inc(1);
         }
@@ -77,7 +80,26 @@ impl Camera{
         Vec3::new(rng.gen::<f64>() - 0.5, rng.gen::<f64>() - 0.5, 0.0)
     }
 
-    fn ray_color(r: &Ray, scene: &Scene) -> Vec3{
+    fn ray_color(r: &Ray, scene: &Scene, depth: i32) -> Vec3{
+        if depth == 0 {
+            return Vec3::new(0.0, 0.0, 0.0);
+        }
+
+        let (hit, record) = scene.intersect(&r, &NEAR_NON_NEG);
+        if hit{
+            let hit_record = record.unwrap();
+            let normal = hit_record.normal;
+            let direction = random_on_hemisphere(&normal) + random_unit_vector();
+            let bounced_ray = Ray::new(hit_record.p, direction);
+            return Camera::ray_color(&bounced_ray, scene, depth-1)*0.3;
+        }
+    
+        let unit_direction = unit_vector(&r.direction);
+        let a = unit_direction.y/2.0+0.5;
+        Vec3::new(1.0, 1.0, 1.0)*(1.0-a)+Vec3::new(0.5, 0.7, 1.0)*a
+    }
+    
+    fn ray_color_normal(r: &Ray, scene: &Scene) -> Vec3{
         let (hit, record) = scene.intersect(&r, &NON_NEG);
         if hit{
             let hit_record = record.unwrap();
@@ -88,6 +110,23 @@ impl Camera{
         let unit_direction = unit_vector(&r.direction);
         let a = unit_direction.y/2.0+0.5;
         Vec3::new(1.0, 1.0, 1.0)*(1.0-a)+Vec3::new(0.5, 0.7, 1.0)*a
+    }
+
+    pub fn linear_to_gamma(x: f64) -> f64{
+        if x > 0.0 {return f64::sqrt(x)} else {return 0.0};
+    }
+    pub fn write_color(v: Vec3){
+        let intensity: Interval = Interval { min: 0.0, max: 0.999};
+
+        let r = Camera::linear_to_gamma(v.x);
+        let g = Camera::linear_to_gamma(v.y);
+        let b = Camera::linear_to_gamma(v.z);
+
+        let rbyte = (intensity.clamp(r) * 256.0) as i32;
+        let gbyte = (intensity.clamp(g) * 256.0) as i32;
+        let bbyte = (intensity.clamp(b) * 256.0) as i32;
+
+        println!("{} {} {}", rbyte, gbyte, bbyte);
     }
 
     fn test_gradient(i: i32, j: i32, image_width: i32, image_height: i32) -> Vec3{

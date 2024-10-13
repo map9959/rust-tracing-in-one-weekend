@@ -11,7 +11,7 @@ impl HitRecord{
         HitRecord{p, normal, t, front_face}
     }
     pub fn generate(p: Vec3, outward_normal: Vec3, t: f64, r: &Ray) -> HitRecord{
-        let front_face: bool = dot(r.direction, outward_normal) < 0.0;
+        let front_face: bool = dot(&r.direction, &outward_normal) < 0.0;
         let normal: Vec3 = if front_face {outward_normal} else {-outward_normal};
         HitRecord{p, normal, t, front_face}
     }
@@ -32,7 +32,7 @@ impl Hittable for Sphere{
     fn intersect(&self, r: &Ray, ray_t: &Interval) -> (bool, Option<HitRecord>) {
         let oc = self.center-r.origin;
         let a = r.direction.length_squared();
-        let h = dot(r.direction, oc);
+        let h = dot(&r.direction, &oc);
         let c = oc.length_squared() - self.radius * self.radius;
 
         let discriminant = h*h - a*c;

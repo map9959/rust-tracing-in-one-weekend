@@ -1,4 +1,6 @@
-use std::{ops, fmt::Display};
+use std::{ops, fmt::Display, f64::consts::PI};
+use rand::Rng;
+use rand_distr::{Normal, Distribution};
 
 use crate::utils::Interval;
 
@@ -56,23 +58,42 @@ impl Display for Vec3{
     }
 }
 
-pub fn write_color(v: Vec3){
-    let intensity: Interval = Interval { min: 0.0, max: 0.999};
-    let rbyte = (intensity.clamp(v.x) * 256.0) as i32;
-    let gbyte = (intensity.clamp(v.y) * 256.0) as i32;
-    let bbyte = (intensity.clamp(v.z) * 256.0) as i32;
-    println!("{} {} {}", rbyte, gbyte, bbyte)
-}
-
-pub fn dot(lhs: Vec3, rhs: Vec3) -> f64{
+pub fn dot(lhs: &Vec3, rhs: &Vec3) -> f64{
     lhs.x*rhs.x + lhs.y*rhs.y + lhs.z*rhs.z
 }
-pub fn cross(lhs: Vec3, rhs: Vec3) -> Vec3{
+pub fn cross(lhs: &Vec3, rhs: &Vec3) -> Vec3{
     Vec3::new(
         lhs.y*rhs.z-lhs.z*rhs.y,
         lhs.z*rhs.x-lhs.x*rhs.z,
         lhs.x*rhs.y-lhs.y*rhs.x)
 }
+
+pub fn random_vec() -> Vec3{
+    let mut rng = rand::thread_rng();
+    Vec3::new(rng.gen::<f64>(), rng.gen::<f64>(), rng.gen::<f64>())
+}
+pub fn random_vec_range(min: f64, max: f64) -> Vec3{
+    let mut rng = rand::thread_rng();
+    Vec3::new(rng.gen_range(min..max), rng.gen_range(min..max), rng.gen_range(min..max))
+}
 pub fn unit_vector(vec: &Vec3) -> Vec3{
     Vec3::new(vec.x, vec.y, vec.z)/(vec.length())
+}
+pub fn random_unit_vector() -> Vec3{
+    let mut rng = rand::thread_rng();
+    let normal = Normal::new(0.0, 1.0).unwrap();
+    let v = Vec3::new(
+        normal.sample(&mut rng),
+        normal.sample(&mut rng),
+        normal.sample(&mut rng)
+    );
+    return unit_vector(&v);
+}
+pub fn random_on_hemisphere(normal: &Vec3) -> Vec3{
+    let v = random_unit_vector();
+    if dot(normal, &v) > 0.0{
+        return v;
+    }else{
+        return -v;
+    }
 }
