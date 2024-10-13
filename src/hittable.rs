@@ -1,8 +1,8 @@
-use crate::{Ray, Vec3, vec3::dot, utils::Interval};
-#[derive(Clone, Copy)]
+use crate::{material::Material, utils::Interval, vec3::dot, Ray, Vec3};
 pub struct HitRecord{
     pub p: Vec3,
     pub normal: Vec3,
+    //pub material: Box<dyn Material>,
     pub t: f64,
     pub front_face: bool
 }
@@ -17,7 +17,7 @@ impl HitRecord{
     }
 }
 pub trait Hittable{
-    fn intersect(&self, r: &Ray, ray_t: &Interval) -> (bool, Option<HitRecord>);
+    fn intersect(&self, r: &Ray, ray_t: &Interval) -> Option<HitRecord>;
 }
 pub struct Sphere{
     center: Vec3,
@@ -29,7 +29,7 @@ impl Sphere{
     }
 }
 impl Hittable for Sphere{
-    fn intersect(&self, r: &Ray, ray_t: &Interval) -> (bool, Option<HitRecord>) {
+    fn intersect(&self, r: &Ray, ray_t: &Interval) -> Option<HitRecord>{
         let oc = self.center-r.origin;
         let a = r.direction.length_squared();
         let h = dot(&r.direction, &oc);
@@ -37,23 +37,23 @@ impl Hittable for Sphere{
 
         let discriminant = h*h - a*c;
         if discriminant < 0.0{
-            return (false, None);
+            return None;
         }else{
             let sqrt_d: f64 = f64::sqrt(discriminant);
             let mut root: f64 = (h-sqrt_d)/a;
             if !ray_t.surrounds(root){
                 root = (h+sqrt_d)/a;
                 if !ray_t.surrounds(root){
-                    return (false, None);
+                    return None;
                 }
             }
             let p = r.at(root);
-            return (true, Some(HitRecord::generate(
+            return Some(HitRecord::generate(
                 p,
                 (p-self.center)/self.radius,
                 root,
                 r
-            )));
+            ));
         }
     }
 }

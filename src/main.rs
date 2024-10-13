@@ -12,6 +12,7 @@ mod hittable;
 mod scene;
 mod utils;
 mod camera;
+mod material;
 
 fn main() {
     let aspect_ratio = 16.0/9.0;
@@ -22,8 +23,8 @@ fn main() {
     let viewport_height = 2.0;
     let camera_center = Vec3::new(0.0, 0.0, 0.0);
 
-    let samples_per_pixel = 20;
-    let max_depth = 10;
+    let samples_per_pixel = 10;
+    let max_depth = 20;
 
     let mut scene = Scene::new();
     let sphere1: Sphere = Sphere::new(
