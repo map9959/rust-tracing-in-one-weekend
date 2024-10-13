@@ -5,6 +5,7 @@ use crate::hittable::Sphere;
 use crate::hittable::Hittable;
 use crate::scene::Scene;
 use crate::camera::Camera;
+use rand::Rng;
 mod vec3;
 mod ray;
 mod hittable;
@@ -21,6 +22,8 @@ fn main() {
     let viewport_height = 2.0;
     let camera_center = Vec3::new(0.0, 0.0, 0.0);
 
+    let samples_per_pixel = 10;
+
     let mut scene = Scene::new();
     let sphere1: Sphere = Sphere::new(
         Vec3::new(0.0, 0.0, -1.0),
@@ -33,6 +36,12 @@ fn main() {
     scene.push(Box::new(sphere1));
     scene.push(Box::new(sphere2));
 
-    let camera = Camera::new(aspect_ratio, image_width, focal_length, viewport_height, camera_center);
+    let camera = Camera::new(
+        aspect_ratio, 
+        image_width, 
+        focal_length, 
+        viewport_height, 
+        camera_center, 
+        samples_per_pixel);
     camera.render(&scene);
 }

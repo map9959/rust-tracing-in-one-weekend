@@ -1,5 +1,7 @@
 use std::{ops, fmt::Display};
 
+use crate::utils::Interval;
+
 #[derive(Copy, Clone)]
 pub struct Vec3{
     pub x: f64,
@@ -55,7 +57,11 @@ impl Display for Vec3{
 }
 
 pub fn write_color(v: Vec3){
-    println!("{} {} {}", (v.x * 255.999) as i32, (v.y * 255.999) as i32, (v.z * 255.999) as i32)
+    let intensity: Interval = Interval { min: 0.0, max: 0.999};
+    let rbyte = (intensity.clamp(v.x) * 256.0) as i32;
+    let gbyte = (intensity.clamp(v.y) * 256.0) as i32;
+    let bbyte = (intensity.clamp(v.z) * 256.0) as i32;
+    println!("{} {} {}", rbyte, gbyte, bbyte)
 }
 
 pub fn dot(lhs: Vec3, rhs: Vec3) -> f64{

@@ -20,6 +20,11 @@ impl Interval{
     pub fn size(&self) -> f64{
         self.max - self.min
     }
+    pub fn clamp(&self, x: f64) -> f64{
+        if x < self.min {return self.min};
+        if x > self.max {return self.max};
+        x
+    }
 }
 pub const EMPTY: Interval = Interval{min: f64::MAX, max: f64::MIN};
 pub const UNIVERSE: Interval = Interval{min: f64::MIN, max: f64::MAX};
