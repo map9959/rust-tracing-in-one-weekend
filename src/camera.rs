@@ -85,13 +85,20 @@ impl Camera{
             return Vec3::new(0.0, 0.0, 0.0);
         }
 
-        let record = scene.intersect(&r, &NEAR_NON_NEG);
-        match record{
+        match scene.intersect(&r, &NEAR_NON_NEG){
             Some(record) => {
-                let normal = record.normal;
-                let direction = random_on_hemisphere(&normal) + random_unit_vector();
-                let bounced_ray = Ray::new(record.p, direction);
-                return Camera::ray_color(&bounced_ray, scene, depth-1)*0.3;
+                match record.material.scatter(&r, &record){
+                    Some((scattered, attenuation)) => {
+                        return Camera::ray_color(&scattered, scene, depth-1)*attenuation;
+                    }
+                    None => {
+                        return Vec3::new(0.0, 0.0, 0.0);
+                    }
+                }
+                //let normal = record.normal;
+                //let direction = random_on_hemisphere(&normal) + random_unit_vector();
+                //let bounced_ray = Ray::new(record.p, direction);
+                //return Camera::ray_color(&bounced_ray, scene, depth-1)*0.3;
             }
             None => {}
         }
@@ -102,8 +109,7 @@ impl Camera{
     }
     
     fn ray_color_normal(r: &Ray, scene: &Scene) -> Vec3{
-        let record = scene.intersect(&r, &NON_NEG);
-        match record{
+        match scene.intersect(&r, &NON_NEG){
             Some(record) => {
                 let normal = record.normal;
                 return Vec3::new(normal.x+1.0, normal.y+1.0, normal.z+1.0)*0.5;
