@@ -4,9 +4,13 @@ use crate::vec3::{Vec3, write_color};
 use crate::ray::Ray;
 use crate::hittable::Sphere;
 use crate::hittable::Hittable;
+use crate::scene::Scene;
+use crate::utils::*;
 mod vec3;
 mod ray;
 mod hittable;
+mod scene;
+mod utils;
 
 fn test_gradient(i: i32, j: i32, image_width: i32, image_height: i32) -> Vec3{
     Vec3::new(
@@ -16,15 +20,11 @@ fn test_gradient(i: i32, j: i32, image_width: i32, image_height: i32) -> Vec3{
     )
 }
 
-fn ray_color(r: Ray) -> Vec3{
-    let sphere: Sphere = Sphere::new(
-        Vec3::new(0.0, 0.0, -1.0),
-        0.5
-    );
-    let hit = sphere.intersect(&r);
-    if hit > 0.0{
-        let intersect_point = r.at(hit);
-        let normal = unit_vector(&(intersect_point-Vec3::new(0.0,0.0,-1.0)));
+fn ray_color(r: Ray, scene: Scene) -> Vec3{
+    let (hit, record) = scene.intersect(&r, &non_neg);
+    if hit{
+        let hit_record = record.unwrap();
+        let normal = hit_record.normal;
         return Vec3::new(normal.x+1.0, normal.y+1.0, normal.z+1.0)*0.5;
     }
 
@@ -62,7 +62,20 @@ fn main() {
             let pixel_direction = pixel_loc - camera_center;
             
             let camera_ray = Ray::new(camera_center, pixel_direction);
-            let color = ray_color(camera_ray);
+
+            let mut scene = Scene::new();
+            let sphere1: Sphere = Sphere::new(
+                Vec3::new(0.0, 0.0, -1.0),
+                0.5
+            );
+            let sphere2: Sphere = Sphere::new(
+                Vec3::new(0.0, -100.5, -1.0),
+                100.0
+            );
+            scene.push(Box::new(sphere1));
+            scene.push(Box::new(sphere2));
+            
+            let color = ray_color(camera_ray, scene);
             write_color(color);
         }
         progress_bar.inc(1);
