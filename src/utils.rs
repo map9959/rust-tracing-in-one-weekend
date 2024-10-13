@@ -1,7 +1,7 @@
-pub const infinity: f64 = f64::MAX;
-pub const pi: f64 = std::f64::consts::PI;
+pub const INFINITY: f64 = f64::MAX;
+pub const PI: f64 = std::f64::consts::PI;
 pub fn degrees_to_radians(degrees: f64) -> f64{
-    degrees/180.0*pi
+    degrees/180.0*PI
 }
 pub struct Interval{
     pub min: f64,
@@ -21,6 +21,6 @@ impl Interval{
         self.max - self.min
     }
 }
-pub const empty: Interval = Interval{min: f64::MAX, max: f64::MIN};
-pub const universe: Interval = Interval{min: f64::MIN, max: f64::MAX};
-pub const non_neg: Interval = Interval{min: 0.0, max: f64::MAX};
+pub const EMPTY: Interval = Interval{min: f64::MAX, max: f64::MIN};
+pub const UNIVERSE: Interval = Interval{min: f64::MIN, max: f64::MAX};
+pub const NON_NEG: Interval = Interval{min: 0.0, max: f64::MAX};
