@@ -1,0 +1,3 @@
+# Ray Tracing in One Weekend
+
+This is a Rust implementation of Peter Shirley's [Ray Tracing in One Weekend](https://raytracing.github.io/books/RayTracingInOneWeekend.html), indeed done in a weekend. I made an attempt to use idiomatic Rust wherever possible; for example, pattern-matching with options rather than modifying structs as arguments. I'm not a fan of "try, check, try again" methods for generating unit vectors on a sphere or vectors in a unit disk, so I implemented my own using math taken from the internet.
