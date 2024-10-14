@@ -1,3 +1,4 @@
+use crate::vec3::cross;
 use crate::vec3::Vec3;
 use crate::vec3::random_on_hemisphere;
 use crate::vec3::random_unit_vector;
@@ -22,24 +23,35 @@ pub struct Camera{
 impl Camera{
     pub fn new(
         aspect_ratio: f64, 
-        image_width: i32, 
-        focal_length: f64, 
-        viewport_height: f64, 
-        camera_center: Vec3,
+        image_width: i32,
+        vfov: f64, 
+        look_from: Vec3,
+        look_at: Vec3,
+        vup: Vec3,
         samples_per_pixel: i32,
         max_depth: i32
     ) -> Camera{
         let image_height = (image_width as f64/aspect_ratio) as i32;
 
+        let camera_center = look_from;
+        let focal_length = (look_from-look_at).length();
+        let theta = degrees_to_radians(vfov);
+        let h = f64::tan(theta/2.0);
+        
+        let viewport_height = 2.0 * h * focal_length;
         let viewport_width = viewport_height * (image_width as f64/image_height as f64);
 
-        let viewport_u = Vec3::new(viewport_width, 0.0, 0.0);
-        let viewport_v = Vec3::new(0.0, -viewport_height, 0.0);
+        let w = unit_vector(&(look_from-look_at));
+        let u = unit_vector(&cross(&vup, &w));
+        let v = cross(&w, &u);
+
+        let viewport_u = u * viewport_width;
+        let viewport_v = v * -viewport_height;
 
         let pixel_delta_u = viewport_u/image_width as f64;
         let pixel_delta_v = viewport_v/image_height as f64;
 
-        let viewport_upper_left = camera_center - Vec3::new(0.0, 0.0, focal_length) - viewport_u/2.0 - viewport_v/2.0;
+        let viewport_upper_left = camera_center - w*focal_length - viewport_u/2.0 - viewport_v/2.0;
         let pixel00_loc = viewport_upper_left + (pixel_delta_u+pixel_delta_v) * 0.5;
 
         Camera{image_width, image_height, camera_center, pixel_delta_u, pixel_delta_v, pixel00_loc, samples_per_pixel, max_depth}

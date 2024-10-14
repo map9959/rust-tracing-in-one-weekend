@@ -1,5 +1,6 @@
 use material::Dielectric;
 use material::{Lambertian, Metal};
+use utils::PI;
 use vec3::unit_vector;
 use crate::vec3::Vec3;
 use crate::ray::Ray;
@@ -22,9 +23,10 @@ fn main() {
 
     let image_width = 400;
 
-    let focal_length = 1.0;
-    let viewport_height = 2.0;
-    let camera_center = Vec3::new(0.0, 0.0, 0.0);
+    let vfov = 20.0;
+    let look_from = Vec3::new(-2.0, 2.0, 1.0);
+    let look_at = Vec3::new(0.0, 0.0, -1.0);
+    let vup = Vec3::new(0.0, 1.0, 0.0);
 
     let samples_per_pixel = 20;
     let max_depth = 100;
@@ -69,9 +71,10 @@ fn main() {
     let camera = Camera::new(
         aspect_ratio, 
         image_width, 
-        focal_length, 
-        viewport_height, 
-        camera_center, 
+        vfov, 
+        look_from, 
+        look_at,
+        vup,
         samples_per_pixel,
         max_depth);
     camera.render(&scene);
