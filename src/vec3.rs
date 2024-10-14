@@ -2,8 +2,6 @@ use std::{ops, fmt::Display, f64::consts::PI};
 use rand::Rng;
 use rand_distr::{Normal, Distribution};
 
-use crate::utils::Interval;
-
 #[derive(Copy, Clone)]
 pub struct Vec3{
     pub x: f64,
@@ -128,6 +126,14 @@ pub fn random_on_hemisphere(normal: &Vec3) -> Vec3{
     }else{
         return -v;
     }
+}
+pub fn random_in_unit_disk() -> Vec3{
+    let rho: f64 = f64::sqrt(rand::random());
+    let phi: f64 = 2.0*PI*rand::random::<f64>();
+
+    let x = rho * f64::cos(phi);
+    let y = rho * f64::sin(phi);
+    return Vec3::new(x, y, 0.0);
 }
 
 ///Reflects a vector v off the surface defined by the normal n.

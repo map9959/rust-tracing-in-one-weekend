@@ -31,6 +31,9 @@ fn main() {
     let samples_per_pixel = 20;
     let max_depth = 100;
 
+    let defocus_angle = 10.0;
+    let focus_dist = 0.5;
+
     let mut scene = Scene::new();
     let material_ground = Lambertian::new(Vec3::new(0.8, 0.8, 0.0));
     let material_s1 = Lambertian::new(Vec3::new(0.1, 0.2, 0.5));
@@ -75,6 +78,8 @@ fn main() {
         look_from, 
         look_at,
         vup,
+        defocus_angle,
+        focus_dist,
         samples_per_pixel,
         max_depth);
     camera.render(&scene);
