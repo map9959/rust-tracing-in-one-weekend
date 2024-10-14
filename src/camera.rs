@@ -51,7 +51,7 @@ impl Camera{
         let v = cross(&w, &u);
 
         let viewport_u = u * viewport_width;
-        let viewport_v = v * -viewport_height;
+        let viewport_v = -v * viewport_height;
 
         let pixel_delta_u = viewport_u/image_width as f64;
         let pixel_delta_v = viewport_v/image_height as f64;

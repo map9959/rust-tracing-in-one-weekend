@@ -128,7 +128,7 @@ pub fn random_on_hemisphere(normal: &Vec3) -> Vec3{
     }
 }
 pub fn random_in_unit_disk() -> Vec3{
-    let rho: f64 = f64::sqrt(rand::random());
+    let rho: f64 = f64::sqrt(rand::random::<f64>());
     let phi: f64 = 2.0*PI*rand::random::<f64>();
 
     let x = rho * f64::cos(phi);
