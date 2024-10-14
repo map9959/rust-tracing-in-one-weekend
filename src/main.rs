@@ -25,14 +25,14 @@ fn main() {
     let viewport_height = 2.0;
     let camera_center = Vec3::new(0.0, 0.0, 0.0);
 
-    let samples_per_pixel = 10;
-    let max_depth = 20;
+    let samples_per_pixel = 20;
+    let max_depth = 100;
 
     let mut scene = Scene::new();
     let material_ground = Lambertian::new(Vec3::new(0.8, 0.8, 0.0));
     let material_s1 = Lambertian::new(Vec3::new(0.1, 0.2, 0.5));
-    let material_s2 = Metal::new(Vec3::new(0.8, 0.8, 0.8));
-    let material_s3 = Metal::new(Vec3::new(0.8, 0.6, 0.2));
+    let material_s2 = Metal::new(Vec3::new(0.8, 0.8, 0.8), 0.3);
+    let material_s3 = Metal::new(Vec3::new(0.8, 0.6, 0.2), 1.0);
     let ground: Sphere = Sphere::new(
         Vec3::new(0.0, -100.5, -1.0),
         100.0,
