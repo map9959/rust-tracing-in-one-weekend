@@ -70,6 +70,13 @@ impl ops::Neg for Vec3{
         return Vec3::new(-self.x, -self.y, -self.z)
     }
 }
+///Extra negation for references
+impl ops::Neg for &Vec3{
+    type Output = Vec3;
+    fn neg(self) -> Self::Output {
+        return Vec3::new(-self.x, -self.y, -self.z)
+    }
+}
 impl Display for Vec3{
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         return write!(f, "{} {} {}", self.x, self.y, self.z);
@@ -126,4 +133,11 @@ pub fn random_on_hemisphere(normal: &Vec3) -> Vec3{
 ///Reflects a vector v off the surface defined by the normal n.
 pub fn reflect(v: &Vec3, n: &Vec3) -> Vec3{
     return *v-n*dot(v, n)*2.0;
+}
+
+pub fn refract(uv: &Vec3, n: &Vec3, etai_over_etat: f64) -> Vec3{
+    let cos_theta = f64::min(dot(&-uv, n), 1.0);
+    let r_out_perpendicular = ((n * cos_theta) + *uv) * etai_over_etat;
+    let r_out_parallel = n*(-f64::sqrt(f64::abs(1.0-r_out_perpendicular.length_squared())));
+    return r_out_perpendicular + r_out_parallel;
 }

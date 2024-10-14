@@ -1,3 +1,4 @@
+use material::Dielectric;
 use material::{Lambertian, Metal};
 use vec3::unit_vector;
 use crate::vec3::Vec3;
@@ -31,7 +32,8 @@ fn main() {
     let mut scene = Scene::new();
     let material_ground = Lambertian::new(Vec3::new(0.8, 0.8, 0.0));
     let material_s1 = Lambertian::new(Vec3::new(0.1, 0.2, 0.5));
-    let material_s2 = Metal::new(Vec3::new(0.8, 0.8, 0.8), 0.3);
+    let material_s2 = Dielectric::new(1.5);
+    let material_s2_bubble = Dielectric::new(1.0/1.5);
     let material_s3 = Metal::new(Vec3::new(0.8, 0.6, 0.2), 1.0);
     let ground: Sphere = Sphere::new(
         Vec3::new(0.0, -100.5, -1.0),
@@ -48,6 +50,11 @@ fn main() {
         0.5,
         Arc::new(material_s2)
     );
+    let s2_bubble: Sphere = Sphere::new(
+        Vec3::new(-1.0, 0.0, -1.0),
+        0.4,
+        Arc::new(material_s2_bubble)
+    );
     let s3: Sphere = Sphere::new(
         Vec3::new(1.0, 0.0, -1.0),
         0.5,
@@ -56,6 +63,7 @@ fn main() {
     scene.push(Box::new(ground));
     scene.push(Box::new(s1));
     scene.push(Box::new(s2));
+    scene.push(Box::new(s2_bubble));
     scene.push(Box::new(s3));
 
     let camera = Camera::new(

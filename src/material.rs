@@ -1,4 +1,4 @@
-use crate::{hittable::HitRecord, ray::Ray, vec3::{random_unit_vector, reflect, dot, Vec3}};
+use crate::{hittable::HitRecord, ray::Ray, vec3::{dot, random_unit_vector, reflect, refract, unit_vector, Vec3}};
 
 pub trait Material{
     fn scatter(&self, r_in: &Ray, record: &HitRecord) -> Option<(Ray, Vec3)>;
@@ -48,5 +48,38 @@ impl Material for Metal{
         } else {
             return None
         }
+    }
+}
+
+pub struct Dielectric{
+    refraction_index: f64
+}
+impl Dielectric{
+    pub fn new(refraction_index: f64) -> Dielectric{
+        Dielectric { refraction_index }
+    }
+    pub fn reflectance(&self, cos_theta: f64) -> f64{
+        let r0: f64 = (1.0-self.refraction_index)/(1.0+self.refraction_index);
+        let r0_squared: f64 = r0*r0;
+        r0_squared + (1.0-r0_squared)*f64::powi(1.0-cos_theta, 5)
+    }
+}
+impl Material for Dielectric{
+    fn scatter(&self, r_in: &Ray, record: &HitRecord) -> Option<(Ray, Vec3)> {
+        let ri = if record.front_face {1.0/self.refraction_index} else {self.refraction_index};
+        let unit_direction = unit_vector(&r_in.direction);
+
+        let cos_theta = f64::min(dot(&-unit_direction, &record.normal), 1.0);
+        let sin_theta = f64::sqrt(1.0-cos_theta*cos_theta);
+
+        let direction = if sin_theta * ri > 1.0 || self.reflectance(cos_theta) > rand::random(){
+            reflect(&unit_direction, &record.normal)
+        } else {
+            refract(&unit_direction, &record.normal, ri)
+        };
+
+        let scattered = Ray::new(record.p, direction);
+        let attenuation = Vec3::new(1.0, 1.0, 1.0);
+        Some((scattered, attenuation))
     }
 }
